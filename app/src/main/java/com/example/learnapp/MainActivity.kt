@@ -4,96 +4,103 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import androidx.core.view.isVisible
-import com.example.learnapp.Constance
-import com.example.learnapp.R
-import com.example.learnapp.SignInUpAct
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import com.example.learnapp.databinding.ActivityMainBinding
 
-
 class MainActivity : AppCompatActivity() {
-    lateinit var bindingClass: ActivityMainBinding
+
     private var login: String = "empty"
     private var password: String = "empty"
     private var name: String = "empty"
-    private var name2: String = "empty"
-    private var name3: String = "empty"
-    private var avatarImageId: Int = 0
+    private var surname: String = "empty"
+    private var patron: String = "empty"
+    private var imageId: Int = 0
 
-    override fun onCreate(s: Bundle?) {
-        super.onCreate(s)
+
+    private lateinit var bindingClass: ActivityMainBinding
+
+    private lateinit var launcherSignIn: ActivityResultLauncher<Intent>
+    private lateinit var launcherSignUp: ActivityResultLauncher<Intent>
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
         bindingClass = ActivityMainBinding.inflate(layoutInflater)
         setContentView(bindingClass.root)
 
-    }
+        launcherSignIn =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { resultIn: ActivityResult ->
+                if (resultIn.resultCode == RESULT_OK) {
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+                    if (resultIn.data?.getStringExtra(Constance.SIGN_STATE) == Constance.SIGN_IN_STATE) {
+                        val l = resultIn.data?.getStringExtra(Constance.LOGIN)
+                        val p = resultIn.data?.getStringExtra(Constance.PASSWORD)
 
-        if(requestCode == Constance.REQUEST_CODE_SIGN_IN){
-            val l = data?.getStringExtra(Constance.LOGIN)
-            val p = data?.getStringExtra(Constance.PASSWORD)
-            if(login == l && password == p){
+                        if (login == l && password == p) {
 
-                bindingClass.imAvatar.visibility = View.VISIBLE
-                bindingClass.imAvatar.setImageResource(avatarImageId)
-                val textInfo = "$name $name2 $name3"
-                bindingClass.tvInfo.text = textInfo
-                bindingClass.bHide.visibility = View.GONE
-                bindingClass.bExit.text = "Выйти"
+                            bindingClass.mainAvatarIv.visibility = View.VISIBLE
+                            bindingClass.mainAvatarIv.setImageResource(imageId)
+                            var textInfo = "$name $surname $patron"
+                            bindingClass.infoTv.text = textInfo
+                            bindingClass.signUpBt.visibility = View.INVISIBLE
+                            bindingClass.exitSignInBt.text = Constance.EXIT
 
-            } else {
+                        } else {
 
-                bindingClass.imAvatar.visibility = View.VISIBLE
-                bindingClass.imAvatar.setImageResource(R.drawable.figa)
-                bindingClass.tvInfo.text = "Такого аккаунта не существует!"
+                            bindingClass.infoTv.text = Constance.FAIL_ENTER
+                            bindingClass.mainAvatarIv.setImageResource(R.drawable.figa)
+
+                        }
+                    }
+
+                }
 
             }
+        launcherSignUp =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { resultUp: ActivityResult ->
+                if (resultUp.resultCode == RESULT_OK) {
 
-        } else if(requestCode == Constance.REQUEST_CODE_SIGN_UP){
+                    login = resultUp.data?.getStringExtra(Constance.LOGIN)!!
+                    password = resultUp.data?.getStringExtra(Constance.PASSWORD)!!
+                    name = resultUp.data?.getStringExtra(Constance.NAME)!!
+                    surname = resultUp.data?.getStringExtra(Constance.SURNAME)!!
+                    patron = resultUp.data?.getStringExtra(Constance.PATRON)!!
+                    imageId = resultUp.data?.getIntExtra(Constance.AVATAR_ID, 0)!!
 
-            login = data?.getStringExtra(Constance.LOGIN)!!
-            password = data.getStringExtra(Constance.PASSWORD)!!
-            name = data.getStringExtra(Constance.NAME)!!
-            name2 = data.getStringExtra(Constance.NAME2)!!
-            name3 = data.getStringExtra(Constance.NAME3)!!
-            avatarImageId = data.getIntExtra(Constance.AVATAR_ID, 0)
-            bindingClass.imAvatar.visibility = View.VISIBLE
-            bindingClass.imAvatar.setImageResource(avatarImageId)
-            val textInfo = "$name $name2 $name3"
-            bindingClass.tvInfo.text = textInfo
-            bindingClass.bHide.visibility = View.GONE
-            bindingClass.bExit.text = "Выйти"
+                    bindingClass.mainAvatarIv.visibility = View.VISIBLE
 
-        }
+                    bindingClass.mainAvatarIv.setImageResource(imageId)
+                    var textInfo = "$name $surname $patron"
+                    bindingClass.infoTv.text = textInfo
+                    bindingClass.signUpBt.visibility = View.INVISIBLE
+                    bindingClass.exitSignInBt.text = Constance.EXIT
+
+
+                } else {
+                    bindingClass.infoTv.text = "fuck"
+
+                }
+            }
     }
 
-    fun onClickSignIn(view: View){
 
-        if(bindingClass.imAvatar.isVisible && bindingClass.tvInfo.text.toString() != "Такого аккаунта не существует!"){
+    fun onClickSignIn(view: View) {
 
-            bindingClass.imAvatar.visibility = View.INVISIBLE
-            bindingClass.tvInfo.text = ""
-            bindingClass.bHide.visibility = View.VISIBLE
-            bindingClass.bExit.text = getString(R.string.sign_in)
-
-        } else {
-
-            val intent = Intent(this, SignInUpAct::class.java)
-            intent.putExtra(Constance.SIGN_STATE, Constance.SIGN_IN_STATE)
-            startActivityForResult(intent, Constance.REQUEST_CODE_SIGN_IN)
-
-        }
+        val intent = Intent(this, RegistrationActivity::class.java)
+        intent.putExtra(Constance.SIGN_STATE, Constance.SIGN_IN_STATE)
+        launcherSignIn.launch(intent)
 
     }
 
-    fun onClickSignUp(view: View){
+    fun onClickSignUp(view: View) {
 
-        val intent = Intent(this, SignInUpAct::class.java)
+        val intent = Intent(this, RegistrationActivity::class.java)
         intent.putExtra(Constance.SIGN_STATE, Constance.SIGN_UP_STATE)
-        startActivityForResult(intent, Constance.REQUEST_CODE_SIGN_UP)
+        launcherSignUp.launch(intent)
 
     }
-
 
 }

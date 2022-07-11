@@ -14,7 +14,7 @@
         android:theme="@style/Theme.LearnApp"
         tools:targetApi="31" >
         <activity
-            android:name=".SignInUpAct"
+            android:name=".RegistrationActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
