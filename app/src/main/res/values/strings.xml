@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">LearnApp</string>
+    <string name="ok" translatable="false">OK</string>
+    <string name="hello_txt">Hello!</string>
+    <string name="user_photo" translatable="false">user_photo</string>
+    <string name="sign_in">Sign in</string>
+    <string name="sign_up">Sign up</string>
+
+</resources>
