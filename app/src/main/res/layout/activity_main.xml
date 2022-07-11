@@ -10,6 +10,7 @@
         android:id="@+id/sign_in_bt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="onClickSignIn"
         android:text="@string/sign_in"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -22,7 +23,8 @@
         android:id="@+id/sing_up_bt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="68dp"
+        android:layout_marginTop="32dp"
+        android:onClick="onClickSignUp"
         android:text="@string/sign_up"
         app:layout_constraintEnd_toEndOf="@+id/sign_in_bt"
         app:layout_constraintStart_toStartOf="@+id/sign_in_bt"
@@ -75,5 +77,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/one" />
+
+    <TextView
+        android:id="@+id/incorrect_tv"
+        android:layout_width="218dp"
+        android:layout_height="43dp"
+        android:gravity="center"
+        android:text="Incorrect login or password"
+        android:textColor="@color/red"
+        android:textSize="16sp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.558" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
