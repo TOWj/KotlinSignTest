@@ -7,6 +7,7 @@ import android.view.View
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.view.isVisible
 import com.example.learnapp.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -21,8 +22,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var bindingClass: ActivityMainBinding
 
-    private lateinit var launcherSignIn: ActivityResultLauncher<Intent>
-    private lateinit var launcherSignUp: ActivityResultLauncher<Intent>
+    private var launcherSignIn: ActivityResultLauncher<Intent>? = null
+    private var launcherSignUp: ActivityResultLauncher<Intent>? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,33 +32,30 @@ class MainActivity : AppCompatActivity() {
         bindingClass = ActivityMainBinding.inflate(layoutInflater)
         setContentView(bindingClass.root)
 
+
+
         launcherSignIn =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { resultIn: ActivityResult ->
                 if (resultIn.resultCode == RESULT_OK) {
+                    val l = resultIn.data?.getStringExtra(Constance.LOGIN)
+                    val p = resultIn.data?.getStringExtra(Constance.PASSWORD)
 
-                    if (resultIn.data?.getStringExtra(Constance.SIGN_STATE) == Constance.SIGN_IN_STATE) {
-                        val l = resultIn.data?.getStringExtra(Constance.LOGIN)
-                        val p = resultIn.data?.getStringExtra(Constance.PASSWORD)
+                    if (login == l && password == p) {
 
-                        if (login == l && password == p) {
+                        bindingClass.mainAvatarIv.visibility = View.VISIBLE
+                        bindingClass.mainAvatarIv.setImageResource(imageId)
+                        var textInfo = "$name $surname $patron"
+                        bindingClass.infoTv.text = textInfo
+                        bindingClass.signUpBt.visibility = View.INVISIBLE
+                        bindingClass.exitSignInBt.text = Constance.EXIT
 
-                            bindingClass.mainAvatarIv.visibility = View.VISIBLE
-                            bindingClass.mainAvatarIv.setImageResource(imageId)
-                            var textInfo = "$name $surname $patron"
-                            bindingClass.infoTv.text = textInfo
-                            bindingClass.signUpBt.visibility = View.INVISIBLE
-                            bindingClass.exitSignInBt.text = Constance.EXIT
-
-                        } else {
-
-                            bindingClass.infoTv.text = Constance.FAIL_ENTER
-                            bindingClass.mainAvatarIv.setImageResource(R.drawable.figa)
-
-                        }
+                    } else {
+                        bindingClass.signUpBt.visibility = View.VISIBLE
+                        bindingClass.infoTv.text = Constance.FAIL_ENTER
+                        bindingClass.mainAvatarIv.visibility = View.VISIBLE
+                        bindingClass.mainAvatarIv.setImageResource(R.drawable.figa)
                     }
-
                 }
-
             }
         launcherSignUp =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { resultUp: ActivityResult ->
@@ -79,19 +77,21 @@ class MainActivity : AppCompatActivity() {
                     bindingClass.exitSignInBt.text = Constance.EXIT
 
 
-                } else {
-                    bindingClass.infoTv.text = "fuck"
-
                 }
             }
     }
 
 
     fun onClickSignIn(view: View) {
+//        bindingClass.avatarIm.visibility = View.INVISIBLE
+//        bindingClass.infoTv.text = ""
+//        bindingClass.signUpBt.visibility = View.VISIBLE
+//        bindingClass.exitSignInBt.text = getString(R.string.sign_in)
 
         val intent = Intent(this, RegistrationActivity::class.java)
         intent.putExtra(Constance.SIGN_STATE, Constance.SIGN_IN_STATE)
-        launcherSignIn.launch(intent)
+        launcherSignIn?.launch(intent)
+
 
     }
 
@@ -99,7 +99,7 @@ class MainActivity : AppCompatActivity() {
 
         val intent = Intent(this, RegistrationActivity::class.java)
         intent.putExtra(Constance.SIGN_STATE, Constance.SIGN_UP_STATE)
-        launcherSignUp.launch(intent)
+        launcherSignUp?.launch(intent)
 
     }
 
